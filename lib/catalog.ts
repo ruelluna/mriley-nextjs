@@ -8,6 +8,8 @@
  *   GERBER_SCOPE  priced | imaged | all       (default priced = the upload set)
  */
 import { DatabaseSync } from "node:sqlite";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import {
   PER_PAGE_OPTIONS,
   money,
@@ -21,7 +23,21 @@ import {
 
 export * from "./catalog-types";
 
-const DB_PATH = process.env.GERBER_DB ?? "/opt/data/gerber_import/gerber.db";
+const STAGING_DB = "/opt/data/gerber_import/gerber.db";
+
+/**
+ * Which database to read, in order of preference:
+ *   1. GERBER_DB                      -- explicit override (full staging DB in dev)
+ *   2. ./data/catalog.db              -- the pruned copy committed for deploys
+ *   3. the staging path               -- local fallback when no pruned copy exists
+ */
+function resolveDbPath(): string {
+  if (process.env.GERBER_DB) return process.env.GERBER_DB;
+  const bundled = join(process.cwd(), "data", "catalog.db");
+  return existsSync(bundled) ? bundled : STAGING_DB;
+}
+
+const DB_PATH = resolveDbPath();
 const SCOPE = (process.env.GERBER_SCOPE ?? "priced") as Scope;
 
 const SCOPE_SQL: Record<Scope, string> = {

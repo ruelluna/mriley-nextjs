@@ -12,6 +12,7 @@ staging database (`gerber.db`) — a searchable, filterable catalog plus a page 
 | `/products/[sku]` | Product page: description, specification, dimensions, every source field, details panel, same-collection cards |
 | `/api/products` | JSON, same query params as `/products`: `q, brand, category, department, min, max, image, sort, page, per` |
 | `/api/products/[sku]` | One product with all source fields; `404` when the SKU is not in scope |
+| `/api/health` | Deployment diagnostics: runtime, resolved DB path, row counts, error (`503` when the DB is unreadable) |
 
 All routes are server-rendered on demand (`ƒ`) — nothing is prerendered, so the data is never stale.
 
@@ -19,8 +20,14 @@ All routes are server-rendered on demand (`ƒ`) — nothing is prerendered, so t
 
 | Env var | Default | Meaning |
 |---|---|---|
-| `GERBER_DB` | `/opt/data/gerber_import/gerber.db` | Path to the staging SQLite database |
+| `GERBER_DB` | `/opt/data/gerber_import/gerber.db` | Path to the SQLite database |
 | `GERBER_SCOPE` | `priced` | Which rows are browsable: `priced` (`Display Price` > 0 — the 6,583-product upload set), `imaged` (rows with an image), `all` (every staged row) |
+
+**Which database is actually read** (first match wins):
+
+1. `GERBER_DB` — explicit override; point it at the full staging DB during development.
+2. `./data/catalog.db` — the pruned copy committed to the repo (6,583 priced products, empty sheet fields stripped, 12 MB) built by `npm run db:build`.
+3. `/opt/data/gerber_import/gerber.db` — the full staging DB on this box as a local fallback.
 
 ```bash
 npm run dev      # http://localhost:3000
@@ -65,6 +72,30 @@ Two rules keep the build working:
 2. **Rows from `node:sqlite` have a null prototype** and cannot be passed to a Client
    Component — map them to plain objects first (`db.prepare().all()` returns them directly).
 
+## Deploying
+
+The site is deployed on Vercel at **https://mriley-nextjs.vercel.app** (auto-deploys `main`).
+
+Serverless hosts have no access to the staging database, so the deploy reads the pruned copy
+committed in the repo:
+
+```bash
+npm run db:build     # gerber.db -> data/catalog.db (re-run whenever the sheet changes)
+git add data/catalog.db && git commit -m "Refresh catalog data" && git push
+```
+
+Two things make that work, and both are easy to lose:
+
+- `data/catalog.db` must be committed — it is the only data a serverless host has.
+- `next.config.ts` keeps it in the function bundle:
+  ```ts
+  outputFileTracingIncludes: { "/*": ["./data/catalog.db"] }
+  ```
+  Without it the file exists in the repo but not at runtime, and every catalog page 500s.
+
+If a deployed page 500s, check `https://mriley-nextjs.vercel.app/api/health` first — it reports the
+resolved database path, whether it exists, the runtime Node version and the exact error.
+
 ## Known gaps
 
 - **No images.** 0 of the 6,583 priced products have an image in the source sheet; cards show a
@@ -72,5 +103,5 @@ Two rules keep the build working:
   separate piece of work.
 - **Product pages are not the store.** Prices are source display prices; confirm on
   gerbersfurniture.com before anything is published.
-- **Deploy target.** The app needs `gerber.db` at runtime, so it belongs on a host that has the
-  file (this VPS / Hostinger). Vercel cannot read it unless the database ships with the deploy.
+- **Deploy data.** Vercel reads only the committed `data/catalog.db` (the priced set). If the whole
+  128k-row sheet ever needs to be browsable, host the app where the full `gerber.db` lives.
