@@ -112,8 +112,25 @@ matters.
 | 5. Handoff | manifest → WooCommerce image pass (PLAN §P8) | images attach during the sync, not before |
 
 **Volume:** ~7,000 page fetches + ~6,400 image downloads. At a polite 1 req/s per host spread over
-4 hosts, roughly **45–60 minutes**. Storage ≈ **2 GB** at full master size (~300 KB average), or
-~750 MB if we pull `w_1000` — plenty for a store page and faster to upload to WooCommerce.
+4 hosts, roughly **45–60 minutes**. Measured cost at `w_1000`: **105 KB average per image**, so the
+full sweep is ≈ **670 MB** (~2 GB at full master size).
+
+**Pilot results — 200 SKUs, 2026-10-05: 152/200 = 76%**
+
+| Brand | Attached | Attempted | Rate |
+|---|---|---|---|
+| Sealy | 84 | 84 | 100% |
+| Uttermost | 49 | 49 | 100% |
+| Tempur-Pedic, Stearns & Foster, Pulaski, Crestview | 16 | 16 | 100% |
+| Flexsteel | 3 | 5 | 60% |
+| 10 long-tail furniture brands | 0 | 44 | 0% |
+| **TOTAL** | **152** | **200** | **76%** |
+
+Every long-tail miss failed identically — the fallback chain ended at a **mattress** dealer
+(`nealshomestore.com:404`) because those brands have no confirmed host yet. The method is not the
+problem: **100% on every brand whose host is known.** 17 images are byte-identical across 2+ SKUs
+(shared accessories/sizes) → dedupe by md5 when uploading to WooCommerce. Fix before the full sweep:
+resolve one host per long-tail brand (§3).
 
 **Artifacts:**
 
@@ -150,8 +167,8 @@ images/ledger.db               sku → status, attempts, host, last_error (resum
 
 | # | Decision | Recommendation |
 |---|---|---|
-| I1 | Image size | `w_1000` (~120 KB) — store-adequate, ~750 MB, faster to upload |
-| I2 | Pilot first? | yes — 200 SKUs, reviewed, then the full sweep |
+| I1 | Image size | **decided — `w_1000`** (measured 105 KB average) |
+| I2 | Pilot first? | **done — 200 SKUs, 76% hit rate (§5)** |
 | I3 | A-America (49 SKUs) | Wayback, or one more dealer host |
 | I4 | Long-tail brands (~166 SKUs) | hunt one host per brand; accept gaps beyond that |
 | I5 | Official feed | ask Gerber's MicroD rep in parallel — it would replace this whole pipeline |
