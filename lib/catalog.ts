@@ -123,7 +123,11 @@ function whereFor(q: Query): { sql: string; params: (string | number)[] } {
   if (q.department) { parts.push("p.department = ?"); params.push(q.department); }
   if (q.min != null) { parts.push("p.price_value >= ?"); params.push(q.min); }
   if (q.max != null) { parts.push("p.price_value <= ?"); params.push(q.max); }
-  if (q.image) parts.push("p.has_image = 1");
+  if (q.image) {
+    parts.push(
+      "(p.has_image = 1 OR EXISTS (SELECT 1 FROM product_images pi2 WHERE pi2.sku = p.sku))",
+    );
+  }
 
   return { sql: parts.join(" AND "), params };
 }
