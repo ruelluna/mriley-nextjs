@@ -33,6 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </Link>
             <nav className="flex items-center gap-4 text-sm text-zinc-500">
               <Link href="/products" className="hover:text-black dark:hover:text-zinc-100">Products</Link>
+              <Link href="/plan" className="hover:text-black dark:hover:text-zinc-100">Plan</Link>
               <Link href="/api/products?per=5" className="hover:text-black dark:hover:text-zinc-100">API</Link>
             </nav>
           </div>

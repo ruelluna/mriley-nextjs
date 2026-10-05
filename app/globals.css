@@ -24,3 +24,101 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Rendered markdown documents (app/plan) */
+.doc {
+  font-size: 15.5px;
+  line-height: 1.72;
+}
+.doc h1 {
+  font-size: 1.9rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+}
+.doc h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 2.25rem 0 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+}
+.doc h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 1.6rem 0 0.5rem;
+}
+.doc p {
+  margin: 0.75rem 0;
+}
+.doc ul,
+.doc ol {
+  margin: 0.75rem 0 0.75rem 1.35rem;
+}
+.doc ul {
+  list-style: disc;
+}
+.doc ol {
+  list-style: decimal;
+}
+.doc li {
+  margin: 0.3rem 0;
+}
+.doc a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.doc strong {
+  font-weight: 600;
+}
+.doc code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.87em;
+  background: color-mix(in srgb, currentColor 9%, transparent);
+  padding: 0.12em 0.35em;
+  border-radius: 0.3rem;
+}
+.doc pre {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 13%, transparent);
+  border-radius: 0.6rem;
+  padding: 0.85rem 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+.doc pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.doc table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+.doc th,
+.doc td {
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+.doc th {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  font-weight: 600;
+}
+.doc blockquote {
+  margin: 1rem 0;
+  padding: 0.35rem 1rem;
+  border-left: 3px solid color-mix(in srgb, currentColor 30%, transparent);
+  color: color-mix(in srgb, currentColor 80%, transparent);
+}
+.doc hr {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+}
