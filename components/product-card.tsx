@@ -12,8 +12,23 @@ export default function ProductCard({ p }: { p: ProductSummary }) {
       href={`/products/${encodeURIComponent(p.sku)}`}
       className="group flex flex-col overflow-hidden rounded-xl border border-black/[.08] transition hover:border-black/[.25] dark:border-white/[.145] dark:hover:border-white/[.3]"
     >
-      <div className="flex h-28 items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200 text-2xl font-semibold text-zinc-400 dark:from-zinc-900 dark:to-zinc-800 dark:text-zinc-600">
-        {p.hasImage ? "🖼" : initials(p.brand)}
+      <div className="flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-800">
+        {p.imageUrl ? (
+          // Links come from the catalog DB (MicroD/WebFronts CDN, already resized), so a
+          // plain <img> avoids spending Vercel image-optimization quota on 6k products.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={p.imageUrl}
+            alt={p.name || p.sku}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-contain p-2 transition duration-200 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <span className="text-2xl font-semibold text-zinc-400 dark:text-zinc-600">
+            {initials(p.brand)}
+          </span>
+        )}
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
         <p className="line-clamp-2 text-sm font-semibold leading-snug text-black dark:text-zinc-50">

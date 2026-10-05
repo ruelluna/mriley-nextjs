@@ -40,6 +40,18 @@ out.exec(`
     woo_id INTEGER, attempts INTEGER NOT NULL DEFAULT 0,
     last_error TEXT, updated_at TEXT
   );
+  -- Image links live in their own table (filled by scripts/attach-images.mjs) so a
+  -- full rebuild never has to know about them, and so a product can carry several.
+  CREATE TABLE IF NOT EXISTS product_images (
+    sku TEXT NOT NULL,
+    position INTEGER NOT NULL DEFAULT 1,
+    url TEXT NOT NULL,            -- what the page loads (display size)
+    full_url TEXT,                -- master / original
+    source TEXT,                  -- webfronts | woo | bucket | ...
+    hash TEXT, bytes INTEGER, md5 TEXT,
+    PRIMARY KEY (sku, position)
+  );
+  CREATE INDEX IF NOT EXISTS idx_product_images_sku ON product_images(sku);
 `);
 
 const rows = src

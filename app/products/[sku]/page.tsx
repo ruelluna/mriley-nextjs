@@ -90,8 +90,8 @@ export default async function ProductPage({ params }: { params: Params }) {
           <p className="mt-2 inline-block rounded-full border border-black/[.12] px-3 py-1 text-xs text-zinc-500 dark:border-white/[.2]">
             ledger: {p.ledgerStatus}
           </p>
-          {!p.hasImage ? (
-            <p className="mt-2 text-xs text-amber-600">No image in source data</p>
+          {p.images.length === 0 ? (
+            <p className="mt-2 text-xs text-amber-600">No image attached yet</p>
           ) : null}
         </div>
       </header>
@@ -131,6 +131,31 @@ export default async function ProductPage({ params }: { params: Params }) {
         </section>
 
         <aside className="space-y-6">
+          {p.images.length > 0 ? (
+            <figure className="overflow-hidden rounded-xl border border-black/[.08] dark:border-white/[.145]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.images[0].fullUrl ?? p.images[0].url}
+                alt={p.name || p.sku}
+                className="w-full bg-white object-contain dark:bg-zinc-950"
+              />
+              {p.images.length > 1 ? (
+                <div className="flex gap-2 border-t border-black/[.06] p-2 dark:border-white/[.08]">
+                  {p.images.slice(1, 5).map((img) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={img.position}
+                      src={img.url}
+                      alt={`${p.name} view ${img.position}`}
+                      loading="lazy"
+                      className="h-16 w-16 rounded object-contain"
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </figure>
+          ) : null}
+
           <div className="rounded-xl border border-black/[.08] p-4 dark:border-white/[.145]">
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">Details</h2>
             <dl>

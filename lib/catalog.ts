@@ -15,6 +15,7 @@ import {
   money,
   type Facet,
   type ProductDetail,
+  type ProductImage,
   type ProductSummary,
   type Scope,
   type SortKey,
@@ -131,6 +132,7 @@ type Row = {
   sku: string; name: string; brand: string; category: string; department: string;
   ptype: string; subtype: string; collection: string; price_value: number | null;
   display_price: string; has_image: number; ledger_status: string; description: string;
+  image_url: string | null;
 };
 
 function toSummary(r: Row): ProductSummary {
@@ -145,11 +147,14 @@ function toSummary(r: Row): ProductSummary {
     collection: r.collection ?? "",
     price: r.price_value,
     displayPrice: r.display_price ?? "",
-    hasImage: !!r.has_image,
+    hasImage: !!r.has_image || !!r.image_url,
+    imageUrl: r.image_url ?? null,
     ledgerStatus: r.ledger_status,
     description: (r.description ?? "").replace(/\s+/g, " ").trim(),
   };
 }
+
+const IMAGE_JOIN = "LEFT JOIN product_images pi ON pi.sku = p.sku AND pi.position = 1";
 
 export function searchProducts(q: Query): {
   rows: ProductSummary[];
@@ -174,8 +179,9 @@ export function searchProducts(q: Query): {
       `SELECT p.sku, ${NAME_SQL} AS name, p.brand, p.category, p.department, p.ptype,
               p.subtype, p.collection, p.price_value, p.display_price, p.has_image,
               COALESCE(l.status,'untracked') AS ledger_status,
-              ${DESC_SQL} AS description
+              ${DESC_SQL} AS description, pi.url AS image_url
        FROM products p LEFT JOIN ledger l ON l.sku = p.sku
+       ${IMAGE_JOIN}
        WHERE ${where}
        ORDER BY ${order}
        LIMIT ? OFFSET ?`,
@@ -191,8 +197,9 @@ export function getProduct(sku: string): ProductDetail | null {
       `SELECT p.sku, ${NAME_SQL} AS name, p.brand, p.category, p.department, p.ptype,
               p.subtype, p.collection, p.price_value, p.display_price, p.has_image,
               COALESCE(l.status,'untracked') AS ledger_status,
-              ${DESC_SQL} AS description, p.raw
+              ${DESC_SQL} AS description, p.raw, pi.url AS image_url
        FROM products p LEFT JOIN ledger l ON l.sku = p.sku
+       ${IMAGE_JOIN}
        WHERE p.sku = ? AND ${SCOPE_SQL[SCOPE]}
        LIMIT 1`,
     )
@@ -211,8 +218,19 @@ export function getProduct(sku: string): ProductDetail | null {
     ...toSummary(r),
     typicalPrice: raw["Typical Price"] ?? "",
     dimensions: { depth: dim("Depth"), height: dim("Height"), width: dim("Width") },
+    images: getImages(r.sku),
     raw,
   };
+}
+
+/** All attached images for a SKU, in display order. */
+export function getImages(sku: string): ProductImage[] {
+  const rows = db()
+    .prepare(
+      `SELECT position, url, full_url FROM product_images WHERE sku = ? ORDER BY position ASC`,
+    )
+    .all(sku) as unknown as { position: number; url: string; full_url: string | null }[];
+  return rows.map((r) => ({ position: r.position, url: r.url, fullUrl: r.full_url }));
 }
 
 /** Other products in the same collection, cheapest first. */
@@ -223,8 +241,9 @@ export function getRelated(collection: string, sku: string, limit = 8): ProductS
       .prepare(
         `SELECT p.sku, ${NAME_SQL} AS name, p.brand, p.category, p.department, p.ptype,
                 p.subtype, p.collection, p.price_value, p.display_price, p.has_image,
-                'untracked' AS ledger_status, '' AS description
+                'untracked' AS ledger_status, '' AS description, pi.url AS image_url
          FROM products p
+         ${IMAGE_JOIN}
          WHERE ${SCOPE_SQL[SCOPE]} AND p.collection = ? AND p.sku <> ?
          ORDER BY p.price_value IS NULL, p.price_value ASC, name COLLATE NOCASE ASC
          LIMIT ?`,

@@ -96,11 +96,34 @@ Two things make that work, and both are easy to lose:
 If a deployed page 500s, check `https://mriley-nextjs.vercel.app/api/health` first — it reports the
 resolved database path, whether it exists, the runtime Node version and the exact error.
 
+## Images
+
+Images are **links in the database**, never files in the repo. The scraper produces image files plus
+a manifest; a script teaches the app about them:
+
+```bash
+npm run db:build                                   # products (drops image rows)
+npm run images:attach -- --manifest /path/manifest.csv   # (re)attach image links
+```
+
+`scripts/attach-images.mjs` writes into the `product_images` table (`sku, position, url, full_url,
+source, hash, bytes, md5`) — `position 1` is the card/primary image, and the app LEFT JOINs it:
+
+- `url` — what the pages load (the scraper stores the CDN's `?imgeng=/w_500` variant, ~30 KB)
+- `full_url` — the master, used for the product-page hero
+- `source` — `webfronts` today; `woo`/`bucket` if the images are later re-hosted
+
+Because only links are stored, **re-hosting the images is a data change, not a code change**: re-run
+`images:attach` with a manifest of the new URLs and the site follows.
+
+Cards use a plain `<img>` with `loading="lazy"` — the CDN already returns a resized thumbnail, so
+Next's image optimizer would only add Vercel cost for 6k products.
+
 ## Known gaps
 
-- **No images.** 0 of the 6,583 priced products have an image in the source sheet; cards show a
-  brand-initial placeholder and product pages say "No image in source data". An image pass is a
-  separate piece of work.
+- **Images: 13 of 6,583 attached (demo sample).** The source sheet has none, so they are pulled from
+  the MicroD CDN — see the harvest plan at `/plan`. Cards fall back to a brand-initial placeholder
+  until a product's image is attached.
 - **Product pages are not the store.** Prices are source display prices; confirm on
   gerbersfurniture.com before anything is published.
 - **Deploy data.** Vercel reads only the committed `data/catalog.db` (the priced set). If the whole

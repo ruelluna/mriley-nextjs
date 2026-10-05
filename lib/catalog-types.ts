@@ -7,6 +7,12 @@
 
 export type Scope = "priced" | "imaged" | "all";
 
+export type ProductImage = {
+  position: number;
+  url: string;
+  fullUrl: string | null;
+};
+
 export type ProductSummary = {
   sku: string;
   name: string;
@@ -19,6 +25,8 @@ export type ProductSummary = {
   price: number | null;
   displayPrice: string;
   hasImage: boolean;
+  /** Display-size URL, or null when no image has been attached yet. */
+  imageUrl: string | null;
   ledgerStatus: string;
   description: string;
 };
@@ -26,6 +34,7 @@ export type ProductSummary = {
 export type ProductDetail = ProductSummary & {
   typicalPrice: string;
   dimensions: { depth: string; height: string; width: string };
+  images: ProductImage[];
   raw: Record<string, string>;
 };
 
