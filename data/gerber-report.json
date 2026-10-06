@@ -1,0 +1,483 @@
+{
+  "generatedAt": "2026-10-06T08:29:23.870Z",
+  "baseUrl": "https://gerbersfurniture.com",
+  "currency": "USD",
+  "headline": {
+    "productsLive": 1304,
+    "storeTotal": 2016,
+    "storeTotalBefore": 712,
+    "imagesOk": 2856,
+    "imagesMiss": 349,
+    "imagesBytes": 198997814,
+    "uploadWallClock": "19m57s",
+    "harvestWallClock": "≈1h16m across pilot + batch 1 + the rest",
+    "agentCostUsd": 0.79765,
+    "scriptTokenCostUsd": 0,
+    "failures": 0
+  },
+  "phases": [
+    {
+      "id": "harvest-pilot",
+      "kind": "harvest",
+      "label": "pilot-200",
+      "title": "Image harvest — pilot",
+      "when": "2026-10-05",
+      "what": "Proved the method end to end: dealer product page → images.webfronts.com/cache/<hash>.jpg, with 200 SKUs stratified across every brand and a resume-safe ledger.",
+      "scope": "200 SKUs, all brands",
+      "requests": "≈300 dealer-page fetches + image downloads",
+      "startedUtc": null,
+      "endedUtc": null,
+      "wallClock": null,
+      "agentCostUsd": null,
+      "tokensSpent": 0,
+      "status": "not metered"
+    },
+    {
+      "id": "harvest-batch-1",
+      "kind": "harvest",
+      "label": "images-1000-sealy-uttermost",
+      "title": "Image harvest — batch 1",
+      "when": "2026-10-06",
+      "what": "First full-scale harvest: 500 Sealy + 500 Uttermost, w_1000 renditions, 5 workers, 1 request/second per dealer host.",
+      "scope": "1,000 SKUs",
+      "requests": "2,000 HTTP requests (1 page fetch + 1 CDN download per image)",
+      "startedUtc": "2026-10-06T00:49:32Z",
+      "endedUtc": "2026-10-06T01:06:08Z",
+      "wallClock": "16m36s",
+      "agentCostUsd": 0.02812,
+      "tokensSpent": 0,
+      "status": "complete"
+    },
+    {
+      "id": "harvest-rest",
+      "kind": "harvest",
+      "label": "images-rest-5430",
+      "title": "Image harvest — the rest of the priced catalog",
+      "when": "2026-10-06",
+      "what": "Every remaining priced SKU with no image yet, run in parallel with the upload. Host lists are rotated per SKU so a brand with five dealers is read at five requests/second in aggregate, while each individual host still sees only one request per second.",
+      "scope": "5,430 SKUs",
+      "requests": "≈2 requests per SKU, plus the retry chain on misses",
+      "startedUtc": "2026-10-06T07:57:20Z",
+      "endedUtc": null,
+      "wallClock": null,
+      "agentCostUsd": null,
+      "tokensSpent": 0,
+      "status": "in progress"
+    },
+    {
+      "id": "upload-pilot",
+      "kind": "upload",
+      "label": "woo-pilot-5",
+      "title": "WooCommerce push — pilot",
+      "when": "2026-10-06",
+      "what": "Five SKUs pushed as drafts and read back: categories under new department parents, brand terms, collection tags, 5–7 ACF spec rows, image uploaded into the store's own media library.",
+      "scope": "5 SKUs",
+      "requests": "5 media uploads + 5 product creates + taxonomy lookups",
+      "startedUtc": "2026-10-06T07:50:02Z",
+      "endedUtc": "2026-10-06T07:50:34Z",
+      "wallClock": "32s",
+      "agentCostUsd": 0,
+      "tokensSpent": 0,
+      "status": "complete"
+    },
+    {
+      "id": "upload-serial",
+      "kind": "upload",
+      "label": "none",
+      "title": "WooCommerce push — first attempt, serial (abandoned)",
+      "when": "2026-10-06",
+      "what": "The same push with one worker: 4.6 s per SKU, measured. At that rate the 5,430-product catalog behind this batch would have taken ~7 hours, so the run was stopped after 100 SKUs and the worker pool was written instead. Its 98 products were kept — the ledger makes that free.",
+      "scope": "100 SKUs before it was stopped",
+      "requests": "≈200 store requests",
+      "forceStatus": "abandoned",
+      "startedUtc": null,
+      "endedUtc": null,
+      "wallClock": null,
+      "agentCostUsd": null,
+      "tokensSpent": 0,
+      "status": "abandoned"
+    },
+    {
+      "id": "upload-bulk",
+      "kind": "upload",
+      "label": "woo-bulk-live-1152",
+      "title": "WooCommerce push — live",
+      "when": "2026-10-06",
+      "what": "The priced, imaged set pushed live at 4 workers. Each product: image → /wp/v2/media, then the product POST with its real fields. Ledger committed only after the store confirms, so a crash resumes instead of duplicating. The scope grew from 1,152 to 1,304 mid-run because the harvest beside it kept adding imaged SKUs and the run re-reads the image ledger.",
+      "scope": "1,152 SKUs at start, 1,304 by the time it finished",
+      "requests": "≈2,400 store requests (1 media upload + 1 product create per product)",
+      "startedUtc": "2026-10-06 07:59:53",
+      "endedUtc": "2026-10-06 08:19:50",
+      "wallClock": "19m57s",
+      "agentCostUsd": 0.009501,
+      "tokensSpent": 0,
+      "status": "complete"
+    }
+  ],
+  "images": {
+    "ok": 2856,
+    "miss": 349,
+    "attempted": 3205,
+    "coveragePct": 89,
+    "bytes": 198997814,
+    "avgKb": 68,
+    "distinctSkus": 3205,
+    "firstWriteUtc": "2026-10-05 02:55:48",
+    "lastWriteUtc": "2026-10-06 08:29:20",
+    "byBrand": [
+      {
+        "brand": "Uttermost",
+        "ok": 2030,
+        "miss": 1,
+        "attempted": 2031,
+        "coveragePct": 100,
+        "bytes": 117429858
+      },
+      {
+        "brand": "Sealy",
+        "ok": 608,
+        "miss": 0,
+        "attempted": 608,
+        "coveragePct": 100,
+        "bytes": 65139338
+      },
+      {
+        "brand": "Tempur-Pedic",
+        "ok": 156,
+        "miss": 219,
+        "attempted": 375,
+        "coveragePct": 42,
+        "bytes": 12236608
+      },
+      {
+        "brand": "Flexsteel",
+        "ok": 43,
+        "miss": 9,
+        "attempted": 52,
+        "coveragePct": 83,
+        "bytes": 2877880
+      },
+      {
+        "brand": "Pulaski Furniture",
+        "ok": 10,
+        "miss": 0,
+        "attempted": 10,
+        "coveragePct": 100,
+        "bytes": 530865
+      },
+      {
+        "brand": "Stearns & Foster",
+        "ok": 8,
+        "miss": 0,
+        "attempted": 8,
+        "coveragePct": 100,
+        "bytes": 744871
+      },
+      {
+        "brand": "Crestview",
+        "ok": 1,
+        "miss": 0,
+        "attempted": 1,
+        "coveragePct": 100,
+        "bytes": 38394
+      },
+      {
+        "brand": "A America",
+        "ok": 0,
+        "miss": 5,
+        "attempted": 5,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "Chromcraft",
+        "ok": 0,
+        "miss": 1,
+        "attempted": 1,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "Classic Flame",
+        "ok": 0,
+        "miss": 1,
+        "attempted": 1,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "England",
+        "ok": 0,
+        "miss": 4,
+        "attempted": 4,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "Green Gables Furniture",
+        "ok": 0,
+        "miss": 8,
+        "attempted": 8,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "Modus Furniture",
+        "ok": 0,
+        "miss": 14,
+        "attempted": 14,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "Natuzzi Editions",
+        "ok": 0,
+        "miss": 5,
+        "attempted": 5,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "Paragon",
+        "ok": 0,
+        "miss": 18,
+        "attempted": 18,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "Sunny Designs",
+        "ok": 0,
+        "miss": 37,
+        "attempted": 37,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "Whittier Wood",
+        "ok": 0,
+        "miss": 22,
+        "attempted": 22,
+        "coveragePct": 0,
+        "bytes": 0
+      },
+      {
+        "brand": "aspenhome",
+        "ok": 0,
+        "miss": 5,
+        "attempted": 5,
+        "coveragePct": 0,
+        "bytes": 0
+      }
+    ],
+    "byHost": [
+      {
+        "host": "www.hefnerfurniture.com",
+        "images": 2083,
+        "bytes": 120838603
+      },
+      {
+        "host": "www.nealshomestore.com",
+        "images": 662,
+        "bytes": 68040658
+      },
+      {
+        "host": "charliewilsons.com",
+        "images": 83,
+        "bytes": 7278099
+      },
+      {
+        "host": "www.unclesamssupercenter.com",
+        "images": 14,
+        "bytes": 982795
+      },
+      {
+        "host": "www.ambersfurnitureusa.com",
+        "images": 13,
+        "bytes": 1722031
+      },
+      {
+        "host": "www.flagcityfurniture.com",
+        "images": 1,
+        "bytes": 135628
+      }
+    ],
+    "missReasons": [
+      {
+        "reason": "404 — dealer does not stock it",
+        "n": 283
+      },
+      {
+        "reason": "www.flagcityfurniture.com:0",
+        "n": 63
+      },
+      {
+        "reason": "page served but exposed no image",
+        "n": 2
+      },
+      {
+        "reason": "cdn:502/0b",
+        "n": 1
+      }
+    ]
+  },
+  "upload": {
+    "productsLive": 1304,
+    "ledgerStates": [
+      {
+        "status": "created",
+        "n": 1192,
+        "withId": 1192
+      },
+      {
+        "status": "duplicate",
+        "n": 430,
+        "withId": 0
+      },
+      {
+        "status": "pending",
+        "n": 126071,
+        "withId": 0
+      },
+      {
+        "status": "skipped",
+        "n": 112,
+        "withId": 112
+      }
+    ],
+    "created": 1304,
+    "skipped": 118,
+    "failed": 0,
+    "runs": [
+      {
+        "runId": "20261006T075002-b0f1f6",
+        "created": 5,
+        "skipped": 0,
+        "failed": 0,
+        "targetSkus": 5,
+        "aborted": true,
+        "startedUtc": "2026-10-06 07:50:13",
+        "finishedUtc": "2026-10-06 07:50:34",
+        "seconds": 21,
+        "wallClock": "21s"
+      },
+      {
+        "runId": "20261006T075124-0b1be6",
+        "created": 105,
+        "skipped": 2,
+        "failed": 0,
+        "targetSkus": 1152,
+        "aborted": true,
+        "startedUtc": "2026-10-06 07:51:30",
+        "finishedUtc": "2026-10-06 07:59:43",
+        "seconds": 493,
+        "wallClock": "8m13s"
+      },
+      {
+        "runId": "20261006T075933-11d2e6",
+        "created": 2,
+        "skipped": 4,
+        "failed": 0,
+        "targetSkus": 6,
+        "aborted": true,
+        "startedUtc": "2026-10-06 07:59:34",
+        "finishedUtc": "2026-10-06 07:59:38",
+        "seconds": 4,
+        "wallClock": "4s"
+      },
+      {
+        "runId": "20261006T075952-879950",
+        "created": 1192,
+        "skipped": 112,
+        "failed": 0,
+        "targetSkus": 1304,
+        "aborted": true,
+        "startedUtc": "2026-10-06 07:59:53",
+        "finishedUtc": "2026-10-06 08:19:50",
+        "seconds": 1197,
+        "wallClock": "19m57s"
+      }
+    ],
+    "bulkSeconds": 1197,
+    "bulkWallClock": "19m57s",
+    "staged": {
+      "rows": 128313,
+      "pricedDistinctSkus": 6582
+    }
+  },
+  "store": {
+    "available": true,
+    "baseUrl": "https://gerbersfurniture.com",
+    "totalProducts": 2016,
+    "mediaItems": 5209,
+    "ours": 1304,
+    "confirmed": 1304,
+    "published": 1304,
+    "images": 1304,
+    "noCategory": 0,
+    "duplicateSkus": [],
+    "priceMin": 83,
+    "priceMax": 10798,
+    "priceMedian": 829,
+    "checkedAt": "2026-10-06T08:29:23.870Z"
+  },
+  "spend": {
+    "sessions": 29,
+    "calls": 837,
+    "inputTokens": 1164305,
+    "outputTokens": 697553,
+    "cacheReadTokens": 68157440,
+    "reasoningTokens": 367739,
+    "totalUsd": 0.79765,
+    "attributedToJobsUsd": 0.037621,
+    "sinceLastSnapshotUsd": 0.039274,
+    "scriptTokenCostUsd": 0,
+    "perThousandProductsUsd": 0.02885,
+    "perThousandImagesUsd": 0.02812,
+    "byDay": [
+      {
+        "day": "2026-10-04",
+        "calls": 195,
+        "usd": 0.229544
+      },
+      {
+        "day": "2026-10-05",
+        "calls": 319,
+        "usd": 0.291105
+      },
+      {
+        "day": "2026-10-06",
+        "calls": 323,
+        "usd": 0.277001
+      }
+    ],
+    "ledgerSnapshotCount": 9
+  },
+  "gaps": [
+    {
+      "what": "Long-tail brands with no reachable dealer host",
+      "detail": "A America, Sunny Designs, Modus, Whittier Wood, Paragon, aspenhome, Green Gables, Natuzzi, England, Chromcraft, Classic Flame — every attempt 404s on the hosts we have, because those dealers do not carry those brands. Fixable with a dealer-host discovery pass, not a pipeline change."
+    },
+    {
+      "what": "Discontinued models inside a working brand",
+      "detail": "Tempur-Pedic misses 219 of 375: 404 on all three of its hosts, i.e. the model is no longer listed by an active dealer. Nothing to fix — report them as unavailable."
+    },
+    {
+      "what": "Products without an image stay out of the store",
+      "detail": "Nothing is pushed image-less. A SKU enters the store only once its image is in hand, so the store never shows a blank product tile."
+    }
+  ],
+  "reproduce": [
+    "python3 harvest_images.py --skus rest_5430.csv --width w_1000 --workers 8 --rate 1.0",
+    "python3 woo_push.py --all --status publish --workers 4 --delay 0.15",
+    "python3 woo_push.py --set-status publish",
+    "python3 woo_push.py --report            # per-SKU status straight from the ledger",
+    "sqlite3 gerber.db \"select sku,status,woo_id,image_id from ledger where sku='…'\"   # 'was SKU X pushed?'"
+  ],
+  "caveats": [
+    "Estimated, not invoiced. DeepSeek returns no billed cost, so every dollar figure comes from the provider's published rate card. Reconcile against the provider dashboard, not this page.",
+    "The scripts themselves spend no model tokens. Harvesting and uploading are plain HTTP; the dollar figure attributed to each job is the agent's own reasoning turns either side of it.",
+    "Agent cost is attributed by the snapshot pair wrapped around each job, so it covers the reasoning around the job — not a per-request model bill.",
+    "Numbers are a snapshot: the image harvest was still running when this page was generated, so the image and coverage figures are a floor, and the store audit is a point-in-time read."
+  ]
+}
