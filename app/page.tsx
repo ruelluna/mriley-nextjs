@@ -37,19 +37,28 @@ export default function Home() {
 
       {s ? (
         <>
-          <dl className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {[
-              { k: "Products", v: s.products.toLocaleString() },
-              { k: "Brands", v: s.brands.toLocaleString() },
-              { k: "Categories", v: s.categories.toLocaleString() },
-              { k: "Collections", v: s.collections.toLocaleString() },
-            ].map(({ k, v }) => (
+          <dl className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {(
+              [
+                { k: "Products staged", v: s.products.toLocaleString(), sub: "priced scope — the upload set" },
+                {
+                  k: "Pushed to WooCommerce",
+                  v: s.pushed.toLocaleString(),
+                  sub: `${s.created.toLocaleString()} created · ${s.alreadyPresent.toLocaleString()} already live`,
+                },
+                { k: "With an image", v: s.imagesLinked.toLocaleString(), sub: "harvested, linked to a SKU" },
+                { k: "Brands", v: s.brands.toLocaleString(), sub: "" },
+                { k: "Categories", v: s.categories.toLocaleString(), sub: "" },
+                { k: "Collections", v: s.collections.toLocaleString(), sub: "" },
+              ] as { k: string; v: string; sub: string }[]
+            ).map(({ k, v, sub }) => (
               <div
                 key={k}
                 className="rounded-xl border border-black/[.08] p-4 dark:border-white/[.145]"
               >
                 <dt className="text-xs uppercase tracking-wider text-zinc-500">{k}</dt>
                 <dd className="mt-1 text-2xl font-semibold text-black dark:text-zinc-50">{v}</dd>
+                {sub ? <div className="mt-1 text-xs text-zinc-500">{sub}</div> : null}
               </div>
             ))}
           </dl>
@@ -58,7 +67,10 @@ export default function Home() {
             Scope <code className="font-mono">{s.scope}</code> · prices{" "}
             {s.minPrice != null ? `$${s.minPrice.toFixed(2)}` : "—"} –{" "}
             {s.maxPrice != null ? `$${s.maxPrice.toFixed(2)}` : "—"} ·{" "}
-            {s.withImage.toLocaleString()} with an image
+            {s.imagesLinked.toLocaleString()} with an image linked ·{" "}
+            <Link href="/reports" className="underline-offset-4 hover:underline">
+              run reports →
+            </Link>
           </p>
 
           <div className="mt-10 flex flex-wrap gap-3">

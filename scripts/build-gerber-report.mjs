@@ -20,7 +20,7 @@
  * store-audit section is marked unavailable instead of failing the build.
  */
 import { DatabaseSync } from "node:sqlite";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const DIR = process.env.GERBER_DIR ?? "/opt/data/gerber_import";
 const IMG_DB = `${DIR}/image_harvest.db`;
@@ -28,7 +28,41 @@ const STAGE_DB = `${DIR}/gerber.db`;
 const LEDGER = process.env.COST_LEDGER ?? `${DIR}/cost_ledger.csv`;
 const STATE_DB = process.env.HERMES_STATE_DB ?? "/opt/data/state.db";
 const BASE = (process.env.WOO_BASE_URL ?? "https://gerbersfurniture.com").replace(/\/$/, "");
-const OUT = new URL("../data/gerber-report.json", import.meta.url).pathname;
+
+// ------------------------------------------------------------------ report identity
+// Every report is a frozen snapshot published at its own URL:
+//   /reports/<slug>/<stamp>   ↔   data/reports/<slug>/<stamp>.json
+// Re-running never overwrites an earlier report; it adds a new one and updates the index.
+const argv = process.argv.slice(2);
+const arg = (flag) => {
+  const i = argv.indexOf(flag);
+  return i >= 0 ? argv[i + 1] : null;
+};
+const STAMP_RE = /^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{4}(am|pm)$/;
+const slug = (arg("--slug") ?? "image-harvest-and-woocommerce-push").toLowerCase();
+const title = arg("--title") ?? "Image harvest and WooCommerce push";
+const topics = (arg("--topics") ?? "image-harvest,woocommerce-push,catalog-sync,cost")
+  .split(",")
+  .map((t) => t.trim())
+  .filter(Boolean);
+if (!/^[a-z0-9-]+$/.test(slug)) {
+  console.error(`--slug must be lowercase letters, digits and hyphens (got "${slug}")`);
+  process.exit(1);
+}
+const pad = (x) => String(x).padStart(2, "0");
+function defaultStamp(d = new Date()) {
+  const h = d.getUTCHours();
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}-${pad(h)}${pad(d.getUTCMinutes())}${h < 12 ? "am" : "pm"}`;
+}
+const stamp = arg("--stamp") ?? defaultStamp();
+if (!STAMP_RE.test(stamp)) {
+  console.error(`--stamp must look like 2026-10-06-0830am (got "${stamp}")`);
+  process.exit(1);
+}
+const REPORTS_DIR = new URL("../data/reports", import.meta.url).pathname;
+const OUT = `${REPORTS_DIR}/${slug}/${stamp}.json`;
+const INDEX = `${REPORTS_DIR}/index.json`;
+const URL_PATH = `/reports/${slug}/${stamp}`;
 
 const num = (v) => Number(v ?? 0);
 const kb = (bytes) => Math.round(num(bytes) / 1024);
@@ -353,12 +387,14 @@ async function main() {
     const start = ledger.filter((r) => r.label.startsWith("START") && r.label.includes(p.label)).at(-1);
     const end = ledger.find((r) => r.label.startsWith("END") && r.label.includes(p.label));
     const agentCostUsd = start && end ? Number((end.cumulativeUsd - start.cumulativeUsd).toFixed(6)) : null;
-    const wallClock = start && end ? human(secs(start.tsUtc, end.tsUtc)) : null;
+    const seconds = start && end ? secs(start.tsUtc, end.tsUtc) : null;
+    const wallClock = seconds != null ? human(seconds) : null;
     return {
       ...p,
       startedUtc: start?.tsUtc ?? null,
       endedUtc: end?.tsUtc ?? null,
       wallClock,
+      seconds,
       agentCostUsd,
       tokensSpent: 0,
       status: p.forceStatus ?? (end ? "complete" : start ? "in progress" : "not metered"),
@@ -416,7 +452,20 @@ async function main() {
 
   const store = await storeAudit(wooIds);
 
+  const harvestSeconds = phases
+    .filter((p) => p.kind === "harvest" && p.seconds != null)
+    .reduce((a, p) => a + p.seconds, 0);
+  const harvestInProgress = phases.some((p) => p.kind === "harvest" && p.status === "in progress");
+
   const report = {
+    meta: {
+      slug,
+      stamp,
+      title,
+      topics,
+      url: URL_PATH,
+      generatedAt: new Date().toISOString(),
+    },
     generatedAt: new Date().toISOString(),
     baseUrl: BASE,
     currency: "USD",
@@ -428,7 +477,7 @@ async function main() {
       imagesMiss: images.miss,
       imagesBytes: images.bytes,
       uploadWallClock: upload.bulkWallClock,
-      harvestWallClock: "≈1h16m across pilot + batch 1 + the rest",
+      harvestWallClock: harvestSeconds ? `${human(harvestSeconds)}${harvestInProgress ? " so far" : ""}` : null,
       agentCostUsd: totalsUsd,
       scriptTokenCostUsd: 0,
       failures: failed,
@@ -478,7 +527,43 @@ async function main() {
     ],
   };
 
+  mkdirSync(`${REPORTS_DIR}/${slug}`, { recursive: true });
   writeFileSync(OUT, JSON.stringify(report, null, 2) + "\n");
+
+  // Index: newest first, one entry per report, never overwriting history.
+  let index = [];
+  if (existsSync(INDEX)) {
+    try {
+      const parsed = JSON.parse(readFileSync(INDEX, "utf8"));
+      if (Array.isArray(parsed)) index = parsed;
+    } catch {
+      index = [];
+    }
+  }
+  index = index.filter((e) => !(e.slug === slug && e.stamp === stamp));
+  index.push({
+    slug,
+    stamp,
+    title,
+    topics,
+    generatedAt: report.meta.generatedAt,
+    url: URL_PATH,
+    headline: {
+      productsLive: report.headline.productsLive,
+      imagesOk: report.headline.imagesOk,
+      imagesMiss: report.headline.imagesMiss,
+      coveragePct: images.coveragePct,
+      uploadWallClock: report.headline.uploadWallClock,
+      harvestWallClock: report.headline.harvestWallClock,
+      agentCostUsd: report.headline.agentCostUsd,
+      scriptTokenCostUsd: report.headline.scriptTokenCostUsd,
+      failures: report.headline.failures,
+    },
+  });
+  index.sort((a, b) => (a.stamp < b.stamp ? 1 : a.stamp > b.stamp ? -1 : 0));
+  writeFileSync(INDEX, JSON.stringify(index, null, 2) + "\n");
+
+  console.log(`report     ${URL_PATH}  (${index.length} in the index)`);
   console.log(`phases     ${phases.map((p) => `${p.id}:${p.status}${p.agentCostUsd != null ? " $" + p.agentCostUsd.toFixed(6) : ""}`).join("  ")}`);
   console.log(`images     ${images.ok} ok / ${images.miss} miss (${images.coveragePct}%), ${(images.bytes / 1e6).toFixed(1)} MB`);
   console.log(`upload     ${created} created / ${skipped} skipped / ${failed} failed in ${upload.bulkWallClock}`);

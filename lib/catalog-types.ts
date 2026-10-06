@@ -59,6 +59,13 @@ export type Stats = {
   categories: number;
   collections: number;
   withImage: number;
+  /** Products with a WooCommerce product id on the ledger — the pushed set. */
+  pushed: number;
+  /** Of those, created by the sync and already on the store when it ran. */
+  created: number;
+  alreadyPresent: number;
+  /** Distinct SKUs with an image link attached (not the same as the staged count). */
+  imagesLinked: number;
   minPrice: number | null;
   maxPrice: number | null;
 };

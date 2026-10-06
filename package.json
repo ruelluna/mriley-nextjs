@@ -10,6 +10,8 @@
     "db:prepare": "node scripts/prepare-db.mjs",
     "db:build": "node scripts/build-catalog-db.mjs",
     "images:attach": "node scripts/attach-images.mjs",
+    "images:manifest": "node scripts/export-image-manifest.mjs",
+    "db:images": "node scripts/export-image-manifest.mjs && node scripts/attach-images.mjs --manifest /opt/data/cache/scratch/images-manifest.csv",
     "spend:build": "node scripts/build-spend.mjs",
     "report:build": "node scripts/build-gerber-report.mjs"
   },

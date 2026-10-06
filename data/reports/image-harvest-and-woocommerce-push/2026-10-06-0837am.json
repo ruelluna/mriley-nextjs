@@ -1,17 +1,30 @@
 {
-  "generatedAt": "2026-10-06T08:29:23.870Z",
+  "meta": {
+    "slug": "image-harvest-and-woocommerce-push",
+    "stamp": "2026-10-06-0837am",
+    "title": "Image harvest and WooCommerce push",
+    "topics": [
+      "image-harvest",
+      "woocommerce-push",
+      "catalog-sync",
+      "cost"
+    ],
+    "url": "/reports/image-harvest-and-woocommerce-push/2026-10-06-0837am",
+    "generatedAt": "2026-10-06T08:37:55.759Z"
+  },
+  "generatedAt": "2026-10-06T08:37:55.759Z",
   "baseUrl": "https://gerbersfurniture.com",
   "currency": "USD",
   "headline": {
     "productsLive": 1304,
     "storeTotal": 2016,
     "storeTotalBefore": 712,
-    "imagesOk": 2856,
+    "imagesOk": 3705,
     "imagesMiss": 349,
-    "imagesBytes": 198997814,
+    "imagesBytes": 273117702,
     "uploadWallClock": "19m57s",
-    "harvestWallClock": "≈1h16m across pilot + batch 1 + the rest",
-    "agentCostUsd": 0.79765,
+    "harvestWallClock": "16m36s so far",
+    "agentCostUsd": 0.866495,
     "scriptTokenCostUsd": 0,
     "failures": 0
   },
@@ -28,6 +41,7 @@
       "startedUtc": null,
       "endedUtc": null,
       "wallClock": null,
+      "seconds": null,
       "agentCostUsd": null,
       "tokensSpent": 0,
       "status": "not metered"
@@ -44,6 +58,7 @@
       "startedUtc": "2026-10-06T00:49:32Z",
       "endedUtc": "2026-10-06T01:06:08Z",
       "wallClock": "16m36s",
+      "seconds": 996,
       "agentCostUsd": 0.02812,
       "tokensSpent": 0,
       "status": "complete"
@@ -60,6 +75,7 @@
       "startedUtc": "2026-10-06T07:57:20Z",
       "endedUtc": null,
       "wallClock": null,
+      "seconds": null,
       "agentCostUsd": null,
       "tokensSpent": 0,
       "status": "in progress"
@@ -76,6 +92,7 @@
       "startedUtc": "2026-10-06T07:50:02Z",
       "endedUtc": "2026-10-06T07:50:34Z",
       "wallClock": "32s",
+      "seconds": 32,
       "agentCostUsd": 0,
       "tokensSpent": 0,
       "status": "complete"
@@ -93,6 +110,7 @@
       "startedUtc": null,
       "endedUtc": null,
       "wallClock": null,
+      "seconds": null,
       "agentCostUsd": null,
       "tokensSpent": 0,
       "status": "abandoned"
@@ -109,37 +127,38 @@
       "startedUtc": "2026-10-06 07:59:53",
       "endedUtc": "2026-10-06 08:19:50",
       "wallClock": "19m57s",
+      "seconds": 1200,
       "agentCostUsd": 0.009501,
       "tokensSpent": 0,
       "status": "complete"
     }
   ],
   "images": {
-    "ok": 2856,
+    "ok": 3705,
     "miss": 349,
-    "attempted": 3205,
-    "coveragePct": 89,
-    "bytes": 198997814,
-    "avgKb": 68,
-    "distinctSkus": 3205,
+    "attempted": 4054,
+    "coveragePct": 91,
+    "bytes": 273117702,
+    "avgKb": 72,
+    "distinctSkus": 4054,
     "firstWriteUtc": "2026-10-05 02:55:48",
-    "lastWriteUtc": "2026-10-06 08:29:20",
+    "lastWriteUtc": "2026-10-06 08:37:52",
     "byBrand": [
       {
         "brand": "Uttermost",
-        "ok": 2030,
+        "ok": 2088,
         "miss": 1,
-        "attempted": 2031,
+        "attempted": 2089,
         "coveragePct": 100,
-        "bytes": 117429858
+        "bytes": 122395123
       },
       {
         "brand": "Sealy",
-        "ok": 608,
+        "ok": 1315,
         "miss": 0,
-        "attempted": 608,
+        "attempted": 1315,
         "coveragePct": 100,
-        "bytes": 65139338
+        "bytes": 123331956
       },
       {
         "brand": "Tempur-Pedic",
@@ -148,6 +167,14 @@
         "attempted": 375,
         "coveragePct": 42,
         "bytes": 12236608
+      },
+      {
+        "brand": "Stearns & Foster",
+        "ok": 92,
+        "miss": 0,
+        "attempted": 92,
+        "coveragePct": 100,
+        "bytes": 11706876
       },
       {
         "brand": "Flexsteel",
@@ -164,14 +191,6 @@
         "attempted": 10,
         "coveragePct": 100,
         "bytes": 530865
-      },
-      {
-        "brand": "Stearns & Foster",
-        "ok": 8,
-        "miss": 0,
-        "attempted": 8,
-        "coveragePct": 100,
-        "bytes": 744871
       },
       {
         "brand": "Crestview",
@@ -273,28 +292,28 @@
     "byHost": [
       {
         "host": "www.hefnerfurniture.com",
-        "images": 2083,
-        "bytes": 120838603
+        "images": 2141,
+        "bytes": 125803868
       },
       {
         "host": "www.nealshomestore.com",
-        "images": 662,
-        "bytes": 68040658
-      },
-      {
-        "host": "charliewilsons.com",
-        "images": 83,
-        "bytes": 7278099
-      },
-      {
-        "host": "www.unclesamssupercenter.com",
-        "images": 14,
-        "bytes": 982795
+        "images": 987,
+        "bytes": 97763300
       },
       {
         "host": "www.ambersfurnitureusa.com",
-        "images": 13,
-        "bytes": 1722031
+        "images": 305,
+        "bytes": 25389028
+      },
+      {
+        "host": "www.unclesamssupercenter.com",
+        "images": 187,
+        "bytes": 16629475
+      },
+      {
+        "host": "charliewilsons.com",
+        "images": 84,
+        "bytes": 7396403
       },
       {
         "host": "www.flagcityfurniture.com",
@@ -419,18 +438,18 @@
     "priceMin": 83,
     "priceMax": 10798,
     "priceMedian": 829,
-    "checkedAt": "2026-10-06T08:29:23.870Z"
+    "checkedAt": "2026-10-06T08:37:55.759Z"
   },
   "spend": {
-    "sessions": 29,
-    "calls": 837,
-    "inputTokens": 1164305,
-    "outputTokens": 697553,
-    "cacheReadTokens": 68157440,
-    "reasoningTokens": 367739,
-    "totalUsd": 0.79765,
+    "sessions": 30,
+    "calls": 881,
+    "inputTokens": 1318737,
+    "outputTokens": 751472,
+    "cacheReadTokens": 72600320,
+    "reasoningTokens": 391233,
+    "totalUsd": 0.866495,
     "attributedToJobsUsd": 0.037621,
-    "sinceLastSnapshotUsd": 0.039274,
+    "sinceLastSnapshotUsd": 0.108119,
     "scriptTokenCostUsd": 0,
     "perThousandProductsUsd": 0.02885,
     "perThousandImagesUsd": 0.02812,
@@ -447,8 +466,8 @@
       },
       {
         "day": "2026-10-06",
-        "calls": 323,
-        "usd": 0.277001
+        "calls": 367,
+        "usd": 0.345846
       }
     ],
     "ledgerSnapshotCount": 9

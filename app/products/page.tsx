@@ -64,8 +64,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">Products</h1>
           <p className="mt-1 text-sm text-zinc-500">
-            {total.toLocaleString()} matching of {stats.products.toLocaleString()} in catalog
+            {total.toLocaleString()} matching of {stats.products.toLocaleString()} staged
             {filtered ? " (filtered)" : ""}
+            {" · "}
+            <Link href="/reports" className="underline-offset-4 hover:underline">
+              {stats.pushed.toLocaleString()} pushed to WooCommerce
+            </Link>
+            {" · "}
+            {stats.imagesLinked.toLocaleString()} with an image
             {" · "}scope <code className="font-mono">{stats.scope}</code>
           </p>
         </div>

@@ -288,6 +288,33 @@ export function getStats(): Stats {
     products: number; brands: number; categories: number; collections: number;
     with_image: number | null; min_price: number | null; max_price: number | null;
   };
+  // Sync state lives on the ledger: a product counts as pushed once it carries a WooCommerce id.
+  // Read separately from the product scan above so a missing ledger degrades to zeros.
+  let sync = { pushed: 0, created: 0, already_present: 0, images: 0 };
+  try {
+    const l = db()
+      .prepare(
+        `SELECT SUM(l.woo_id IS NOT NULL) AS pushed,
+                SUM(l.status = 'created')  AS created,
+                SUM(l.status = 'skipped')  AS already_present
+         FROM ledger l WHERE EXISTS (SELECT 1 FROM products p WHERE p.sku = l.sku)`,
+      )
+      .get() as unknown as { pushed: number | null; created: number | null; already_present: number | null };
+    const i = db()
+      .prepare(
+        `SELECT COUNT(DISTINCT pi.sku) AS n FROM product_images pi
+         WHERE EXISTS (SELECT 1 FROM products p WHERE p.sku = pi.sku)`,
+      )
+      .get() as unknown as { n: number | null };
+    sync = {
+      pushed: l?.pushed ?? 0,
+      created: l?.created ?? 0,
+      already_present: l?.already_present ?? 0,
+      images: i?.n ?? 0,
+    };
+  } catch {
+    /* ledger or image table absent — leave the zeros */
+  }
   return {
     scope: SCOPE,
     products: s.products,
@@ -295,6 +322,10 @@ export function getStats(): Stats {
     categories: s.categories,
     collections: s.collections,
     withImage: s.with_image ?? 0,
+    pushed: sync.pushed,
+    created: sync.created,
+    alreadyPresent: sync.already_present,
+    imagesLinked: sync.images,
     minPrice: s.min_price,
     maxPrice: s.max_price,
   };

@@ -95,6 +95,15 @@ for (const r of rows) {
 }
 db.exec("COMMIT");
 
+// Keep the products.has_image flag in step with the manifest, so "with an image" counts in the
+// app (and the `imaged` scope) never disagree with product_images.
+const flag = db
+  .prepare(
+    `UPDATE products SET has_image = 1
+     WHERE has_image <> 1 AND sku IN (SELECT DISTINCT sku FROM product_images)`,
+  )
+  .run();
+
 const known = db
   .prepare(
     `SELECT COUNT(*) AS n FROM product_images pi
