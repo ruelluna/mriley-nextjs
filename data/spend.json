@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-06T01:28:22.338Z",
+  "generatedAt": "2026-10-06T01:29:22.696Z",
   "source": {
     "stateDb": "/opt/data/state.db",
     "ledger": "/opt/data/gerber_import/cost_ledger.csv"
@@ -7,13 +7,13 @@
   "currency": "USD",
   "totals": {
     "sessions": 21,
-    "calls": 645,
-    "inputTokens": 925686,
-    "outputTokens": 546868,
-    "cacheReadTokens": 50458368,
+    "calls": 650,
+    "inputTokens": 928219,
+    "outputTokens": 548650,
+    "cacheReadTokens": 50842624,
     "cacheWriteTokens": 0,
-    "reasoningTokens": 284359,
-    "estimatedUsd": 0.618349,
+    "reasoningTokens": 285254,
+    "estimatedUsd": 0.620951,
     "actualUsd": 0
   },
   "byDay": [
@@ -37,19 +37,19 @@
     },
     {
       "day": "2026-10-06",
-      "calls": 131,
-      "inputTokens": 175970,
-      "outputTokens": 89047,
-      "cacheReadTokens": 5958656,
-      "reasoningTokens": 46865,
-      "usd": 0.0977
+      "calls": 136,
+      "inputTokens": 178503,
+      "outputTokens": 90829,
+      "cacheReadTokens": 6342912,
+      "reasoningTokens": 47760,
+      "usd": 0.100302
     }
   ],
   "byComponent": [
     {
       "component": "(main turns)",
-      "calls": 422,
-      "usd": 0.449434
+      "calls": 425,
+      "usd": 0.451646
     },
     {
       "component": "background_review",
@@ -58,8 +58,8 @@
     },
     {
       "component": "approval",
-      "calls": 152,
-      "usd": 0.021658
+      "calls": 154,
+      "usd": 0.022048
     },
     {
       "component": "compression",
@@ -76,8 +76,8 @@
     {
       "model": "deepseek-flash",
       "provider": "deepseek",
-      "calls": 645,
-      "usd": 0.618349
+      "calls": 650,
+      "usd": 0.620951
     }
   ],
   "pricing": [
@@ -127,7 +127,7 @@
       "deltaUsd": 0.02812
     }
   ],
-  "afterLastSnapshotUsd": 0.055903,
+  "afterLastSnapshotUsd": 0.058505,
   "jobs": [
     {
       "id": "images-batch-1",

@@ -222,7 +222,7 @@ export default function CostsPage() {
 
       <Section
         title="Ledger"
-        note={`Cumulative snapshots taken on the Gerber box. ${usd(spend.afterLastSnapshotUsd)} has been spent since the last snapshot — the catalog rebuild, the attach and the deploy.`}
+        note={`Cumulative snapshots taken on the Gerber box. ${usd(spend.afterLastSnapshotUsd)} has been spent since the last snapshot — everything after it: the catalog rebuild, the image attach, the deploy, and building this page.`}
       >
         <table className="w-full border-collapse">
           <thead className="border-b border-black/[.08] dark:border-white/[.145]">
