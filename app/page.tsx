@@ -44,7 +44,7 @@ export default function Home() {
                 {
                   k: "Pushed to WooCommerce",
                   v: s.pushed.toLocaleString(),
-                  sub: `${s.created.toLocaleString()} created · ${s.alreadyPresent.toLocaleString()} already live`,
+                  sub: "carry a WooCommerce product id",
                 },
                 { k: "With an image", v: s.imagesLinked.toLocaleString(), sub: "harvested, linked to a SKU" },
                 { k: "Brands", v: s.brands.toLocaleString(), sub: "" },
