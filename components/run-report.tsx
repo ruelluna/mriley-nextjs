@@ -189,7 +189,7 @@ export default function RunReport({ report }: { report: Report }) {
         <Card
           label="Wall clock — push"
           value={h.uploadWallClock ?? "—"}
-          sub={`${n(report.upload.created)} created, ${n(report.upload.skipped)} already present, ${n(h.failures)} failed`}
+          sub={`${n(report.upload.createdByUs ?? report.upload.created)} created by us · ${n(report.upload.alreadyOnStore ?? report.upload.skipped)} already on the store · ${n(h.failures)} failed`}
         />
         <Card
           label="Agent cost, entire project"

@@ -73,6 +73,8 @@ export type Report = {
   };
   upload: {
     productsLive: number;
+    createdByUs?: number;
+    alreadyOnStore?: number;
     created: number;
     skipped: number;
     failed: number;

@@ -376,15 +376,32 @@ async function main() {
       wallClock: human(win?.seconds ?? null),
     };
   });
-  const created = runList.reduce((a, r) => a + r.created, 0);
-  const skipped = runList.reduce((a, r) => a + r.skipped, 0);
   const failed = runList.reduce((a, r) => a + r.failed, 0);
 
+  // Per-run tallies double count: a SKU created in the first pass is recorded as "skipped" when a
+  // later pass sees it already live. Attribute each SKU by the outcome of the FIRST run that
+  // touched it — that is what actually happened to it.
+  const firstOutcome = db
+    .prepare(
+      `WITH f AS (
+         SELECT sku, action, ROW_NUMBER() OVER (PARTITION BY sku ORDER BY ts ASC) rn
+         FROM run_items WHERE action IN ('created','skipped','exists')
+       )
+       SELECT SUM(action = 'created') AS created, SUM(action IN ('skipped','exists')) AS already
+       FROM f WHERE rn = 1`,
+    )
+    .get();
+  const createdByUs = num(firstOutcome.created);
+  const alreadyOnStore = num(firstOutcome.already);
+  const productsLive = num(db.prepare(`SELECT COUNT(*) AS n FROM ledger WHERE woo_id IS NOT NULL`).get().n);
+
   const upload = {
-    productsLive: num(led.find((l) => l.status === "created")?.withId) + num(led.find((l) => l.status === "skipped")?.withId),
+    productsLive,
     ledgerStates: led,
-    created,
-    skipped,
+    createdByUs,
+    alreadyOnStore,
+    created: createdByUs,
+    skipped: alreadyOnStore,
     failed,
     runs: runList,
     bulkSeconds: runList.find((r) => r.runId.includes("075952"))?.seconds ?? null,
@@ -457,7 +474,7 @@ async function main() {
     attributedToJobsUsd: attributedUsd,
     sinceLastSnapshotUsd: last ? Number((totalsUsd - last.cumulativeUsd).toFixed(6)) : null,
     scriptTokenCostUsd: 0,
-    perThousandProductsUsd: created ? Number(((attributedUsd / created) * 1000).toFixed(6)) : null,
+    perThousandProductsUsd: createdByUs ? Number(((attributedUsd / createdByUs) * 1000).toFixed(6)) : null,
     perThousandImagesUsd: images.ok ? Number(((0.02812 / 1000) * 1000).toFixed(6)) : null,
     byDay,
     ledgerSnapshotCount: ledger.length,
@@ -469,6 +486,11 @@ async function main() {
     .filter((p) => p.kind === "harvest" && p.seconds != null)
     .reduce((a, p) => a + p.seconds, 0);
   const harvestInProgress = phases.some((p) => p.kind === "harvest" && p.status === "in progress");
+  // Total wall clock for the push: every completed pass, not just the biggest one.
+  const uploadSeconds = phases
+    .filter((p) => p.kind === "upload" && p.status === "complete" && p.seconds != null)
+    .reduce((a, p) => a + p.seconds, 0);
+  const uploadWallClockText = uploadSeconds ? human(uploadSeconds) : null;
 
   const report = {
     meta: {
@@ -489,7 +511,7 @@ async function main() {
       imagesOk: images.ok,
       imagesMiss: images.miss,
       imagesBytes: images.bytes,
-      uploadWallClock: upload.bulkWallClock,
+      uploadWallClock: uploadWallClockText,
       harvestWallClock: harvestSeconds ? `${human(harvestSeconds)}${harvestInProgress ? " so far" : ""}` : null,
       agentCostUsd: totalsUsd,
       scriptTokenCostUsd: 0,
@@ -535,8 +557,9 @@ async function main() {
         "figure attributed to each job is the agent's own reasoning turns either side of it.",
       "Agent cost is attributed by the snapshot pair wrapped around each job, so it covers the reasoning " +
         "around the job — not a per-request model bill.",
-      "Numbers are a snapshot: the image harvest was still running when this page was generated, so the " +
-        "image and coverage figures are a floor, and the store audit is a point-in-time read.",
+      harvestInProgress
+        ? "Numbers are a snapshot: the image harvest was still running when this page was generated, so the image and coverage figures are a floor, and the store audit is a point-in-time read."
+        : "Numbers are a snapshot: the store audit is a point-in-time read of the live catalog, and anything pushed after this report was generated is not counted here.",
     ],
   };
 
@@ -579,7 +602,7 @@ async function main() {
   console.log(`report     ${URL_PATH}  (${index.length} in the index)`);
   console.log(`phases     ${phases.map((p) => `${p.id}:${p.status}${p.agentCostUsd != null ? " $" + p.agentCostUsd.toFixed(6) : ""}`).join("  ")}`);
   console.log(`images     ${images.ok} ok / ${images.miss} miss (${images.coveragePct}%), ${(images.bytes / 1e6).toFixed(1)} MB`);
-  console.log(`upload     ${created} created / ${skipped} skipped / ${failed} failed in ${upload.bulkWallClock}`);
+  console.log(`upload     ${productsLive} live / ${createdByUs} created by us / ${alreadyOnStore} already there / ${failed} failed in ${uploadWallClockText}`);
   console.log(`store      ${store.available ? `${store.totalProducts} products, ${store.confirmed}/${store.ours} confirmed, ${store.images} with image` : "unavailable: " + store.reason}`);
   console.log(`spend      $${spend.totalUsd.toFixed(6)} total, $${spend.attributedToJobsUsd.toFixed(6)} attributed to jobs`);
   console.log(`written    ${OUT}`);
