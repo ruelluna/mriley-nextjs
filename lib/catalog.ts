@@ -96,6 +96,8 @@ export type Query = {
   min?: number | null;
   max?: number | null;
   image?: boolean;
+  /** "live" = pushed to the store, "none" = not pushed yet. */
+  store?: "live" | "none";
   sort?: SortKey;
   page?: number;
   per?: number;
@@ -128,6 +130,12 @@ function whereFor(q: Query): { sql: string; params: (string | number)[] } {
       "(p.has_image = 1 OR EXISTS (SELECT 1 FROM product_images pi2 WHERE pi2.sku = p.sku))",
     );
   }
+  // Pushed state comes from the ledger: a row with a woo_id has a product on the store.
+  if (q.store === "live") {
+    parts.push("EXISTS (SELECT 1 FROM ledger l3 WHERE l3.sku = p.sku AND l3.woo_id IS NOT NULL)");
+  } else if (q.store === "none") {
+    parts.push("NOT EXISTS (SELECT 1 FROM ledger l3 WHERE l3.sku = p.sku AND l3.woo_id IS NOT NULL)");
+  }
 
   return { sql: parts.join(" AND "), params };
 }
@@ -136,7 +144,7 @@ type Row = {
   sku: string; name: string; brand: string; category: string; department: string;
   ptype: string; subtype: string; collection: string; price_value: number | null;
   display_price: string; has_image: number; ledger_status: string; description: string;
-  image_url: string | null;
+  image_url: string | null; woo_id: number | null; woo_url: string | null;
 };
 
 function toSummary(r: Row): ProductSummary {
@@ -154,6 +162,8 @@ function toSummary(r: Row): ProductSummary {
     hasImage: !!r.has_image || !!r.image_url,
     imageUrl: r.image_url ?? null,
     ledgerStatus: r.ledger_status,
+    wooId: r.woo_id ?? null,
+    storeUrl: r.woo_url ?? null,
     description: (r.description ?? "").replace(/\s+/g, " ").trim(),
   };
 }
@@ -182,7 +192,7 @@ export function searchProducts(q: Query): {
     .prepare(
       `SELECT p.sku, ${NAME_SQL} AS name, p.brand, p.category, p.department, p.ptype,
               p.subtype, p.collection, p.price_value, p.display_price, p.has_image,
-              COALESCE(l.status,'untracked') AS ledger_status,
+              COALESCE(l.status,'untracked') AS ledger_status, l.woo_id, l.woo_url,
               ${DESC_SQL} AS description, pi.url AS image_url
        FROM products p LEFT JOIN ledger l ON l.sku = p.sku
        ${IMAGE_JOIN}
@@ -200,7 +210,7 @@ export function getProduct(sku: string): ProductDetail | null {
     .prepare(
       `SELECT p.sku, ${NAME_SQL} AS name, p.brand, p.category, p.department, p.ptype,
               p.subtype, p.collection, p.price_value, p.display_price, p.has_image,
-              COALESCE(l.status,'untracked') AS ledger_status,
+              COALESCE(l.status,'untracked') AS ledger_status, l.woo_id, l.woo_url,
               ${DESC_SQL} AS description, p.raw, pi.url AS image_url
        FROM products p LEFT JOIN ledger l ON l.sku = p.sku
        ${IMAGE_JOIN}
@@ -290,16 +300,17 @@ export function getStats(): Stats {
   };
   // Sync state lives on the ledger: a product counts as pushed once it carries a WooCommerce id.
   // Read separately from the product scan above so a missing ledger degrades to zeros.
-  let sync = { pushed: 0, created: 0, already_present: 0, images: 0 };
+  let sync = { pushed: 0, created: 0, already_present: 0, images: 0, store_linked: 0 };
   try {
     const l = db()
       .prepare(
         `SELECT SUM(l.woo_id IS NOT NULL) AS pushed,
                 SUM(l.status = 'created')  AS created,
-                SUM(l.status = 'skipped')  AS already_present
+                SUM(l.status = 'skipped')  AS already_present,
+                SUM(l.woo_url IS NOT NULL AND l.woo_url <> '') AS store_linked
          FROM ledger l WHERE EXISTS (SELECT 1 FROM products p WHERE p.sku = l.sku)`,
       )
-      .get() as unknown as { pushed: number | null; created: number | null; already_present: number | null };
+      .get() as unknown as { pushed: number | null; created: number | null; already_present: number | null; store_linked: number | null };
     const i = db()
       .prepare(
         `SELECT COUNT(DISTINCT pi.sku) AS n FROM product_images pi
@@ -311,6 +322,7 @@ export function getStats(): Stats {
       created: l?.created ?? 0,
       already_present: l?.already_present ?? 0,
       images: i?.n ?? 0,
+      store_linked: l?.store_linked ?? 0,
     };
   } catch {
     /* ledger or image table absent — leave the zeros */
@@ -326,6 +338,7 @@ export function getStats(): Stats {
     created: sync.created,
     alreadyPresent: sync.already_present,
     imagesLinked: sync.images,
+    storeLinked: sync.store_linked,
     minPrice: s.min_price,
     maxPrice: s.max_price,
   };

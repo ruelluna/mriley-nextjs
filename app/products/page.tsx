@@ -36,12 +36,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
   const per = Number(one(sp.per)) || 24;
   const page = Number(one(sp.page)) || 1;
   const image = one(sp.image) === "1";
+  const storeRaw = one(sp.store);
+  const store = storeRaw === "live" || storeRaw === "none" ? (storeRaw as "live" | "none") : undefined;
 
   const stats = getStats();
   const { brands, categories, departments } = getFacets();
   const { rows, total, pages, page: current } = searchProducts({
     q, brand, category, department,
-    min: num(min), max: num(max), image, sort, page, per,
+    min: num(min), max: num(max), image, store, sort, page, per,
   });
 
   const params = {
@@ -54,6 +56,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
     sort: sort === "price_asc" ? undefined : sort,
     per: per === 24 ? undefined : String(per),
     image: image ? "1" : undefined,
+    store: store ?? undefined,
   };
 
   const filtered = Object.values(params).some(Boolean);
@@ -67,11 +70,17 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
             {total.toLocaleString()} matching of {stats.products.toLocaleString()} staged
             {filtered ? " (filtered)" : ""}
             {" · "}
-            <Link href="/reports" className="underline-offset-4 hover:underline">
-              {stats.pushed.toLocaleString()} pushed to WooCommerce
+            <Link href="/products?store=live" className="underline-offset-4 hover:underline">
+              {stats.pushed.toLocaleString()} uploaded
             </Link>
             {" · "}
-            {stats.imagesLinked.toLocaleString()} with an image
+            <Link href="/products?store=none" className="underline-offset-4 hover:underline">
+              {Math.max(0, stats.products - stats.pushed).toLocaleString()} not uploaded
+            </Link>
+            {" · "}
+            <Link href="/products?image=1" className="underline-offset-4 hover:underline">
+              {stats.imagesLinked.toLocaleString()} with an image
+            </Link>
             {" · "}scope <code className="font-mono">{stats.scope}</code>
           </p>
         </div>
@@ -86,7 +95,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
           categories={categories}
           departments={departments}
           sorts={SORTS}
-          values={{ q, brand, category, department, min, max, sort, per: String(per), image }}
+          values={{ q, brand, category, department, min, max, sort, per: String(per), image, store: store ?? "" }}
+          storeCounts={{
+            all: stats.products,
+            live: stats.pushed,
+            none: Math.max(0, stats.products - stats.pushed),
+          }}
         />
       </div>
 

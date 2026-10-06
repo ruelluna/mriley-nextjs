@@ -90,6 +90,21 @@ export default async function ProductPage({ params }: { params: Params }) {
           <p className="mt-2 inline-block rounded-full border border-black/[.12] px-3 py-1 text-xs text-zinc-500 dark:border-white/[.2]">
             ledger: {p.ledgerStatus}
           </p>
+          {p.storeUrl ? (
+            <p className="mt-2">
+              <a
+                href={p.storeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={p.storeUrl}
+                className="inline-block rounded-full bg-black px-4 py-1.5 text-xs font-medium text-white dark:bg-white dark:text-black"
+              >
+                View on gerbersfurniture.com ↗
+              </a>
+            </p>
+          ) : (
+            <p className="mt-2 text-xs text-zinc-500">Not uploaded to the store yet</p>
+          )}
           {p.images.length === 0 ? (
             <p className="mt-2 text-xs text-amber-600">No image attached yet</p>
           ) : null}

@@ -133,6 +133,19 @@ const PHASES = [
     forceStatus: "abandoned",
   },
   {
+    id: "upload-rest",
+    kind: "upload",
+    label: "woo-bulk-live-rest",
+    title: "WooCommerce push — everything imaged since",
+    when: "2026-10-06",
+    what:
+      "Second pass over the SKUs that became imaged after the first push finished. Same script and the " +
+      "same per-SKU ledger, so a product already live is recognised and skipped rather than re-posted: " +
+      "only genuinely new SKUs cost a request.",
+    scope: "Every imaged SKU not yet on the store",
+    requests: "≈2 store requests per new product",
+  },
+  {
     id: "upload-bulk",
     kind: "upload",
     label: "woo-bulk-live-1152",

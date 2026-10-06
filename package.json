@@ -13,7 +13,9 @@
     "images:manifest": "node scripts/export-image-manifest.mjs",
     "db:images": "node scripts/export-image-manifest.mjs && node scripts/attach-images.mjs --manifest /opt/data/cache/scratch/images-manifest.csv",
     "spend:build": "node scripts/build-spend.mjs",
-    "report:build": "node scripts/build-gerber-report.mjs"
+    "report:build": "node scripts/build-gerber-report.mjs",
+    "store:sync": "node scripts/sync-store-links.mjs",
+    "db:refresh": "npm run db:build && npm run db:images && npm run store:sync"
   },
   "dependencies": {
     "marked": "^18.0.14",

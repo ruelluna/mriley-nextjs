@@ -28,6 +28,10 @@ export type ProductSummary = {
   /** Display-size URL, or null when no image has been attached yet. */
   imageUrl: string | null;
   ledgerStatus: string;
+  /** WooCommerce product id, once the SKU has been pushed (null while it hasn't). */
+  wooId: number | null;
+  /** Permalink captured from the store's API — the real product URL, null when not pushed. */
+  storeUrl: string | null;
   description: string;
 };
 
@@ -66,6 +70,8 @@ export type Stats = {
   alreadyPresent: number;
   /** Distinct SKUs with an image link attached (not the same as the staged count). */
   imagesLinked: number;
+  /** Ledger rows carrying a store permalink captured from the WooCommerce API. */
+  storeLinked: number;
   minPrice: number | null;
   maxPrice: number | null;
 };

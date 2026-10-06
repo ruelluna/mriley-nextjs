@@ -14,6 +14,8 @@ export type FilterValues = {
   sort: string;
   per: string;
   image: boolean;
+  /** "", "live" (pushed to WooCommerce) or "none" (not pushed). */
+  store: string;
 };
 
 /** Server-rendered search form; selects auto-submit, no client state needed. */
@@ -23,12 +25,14 @@ export default function FilterForm({
   departments,
   sorts,
   values,
+  storeCounts,
 }: {
   brands: Facet[];
   categories: Facet[];
   departments: Facet[];
   sorts: { key: string; label: string }[];
   values: FilterValues;
+  storeCounts: { all: number; live: number; none: number };
 }) {
   const submitOnChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
     e.currentTarget.form?.requestSubmit();
@@ -101,6 +105,12 @@ export default function FilterForm({
               {f.value} ({f.n})
             </option>
           ))}
+        </select>
+
+        <select name="store" defaultValue={values.store} onChange={submitOnChange} className={input}>
+          <option value="">Uploaded or not ({storeCounts.all.toLocaleString()})</option>
+          <option value="live">Uploaded to WooCommerce ({storeCounts.live.toLocaleString()})</option>
+          <option value="none">Not uploaded ({storeCounts.none.toLocaleString()})</option>
         </select>
 
         <select name="sort" defaultValue={values.sort} onChange={submitOnChange} className={input}>

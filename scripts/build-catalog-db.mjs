@@ -38,7 +38,10 @@ out.exec(`
     sku TEXT PRIMARY KEY, row_id INTEGER,
     status TEXT NOT NULL DEFAULT 'pending',
     woo_id INTEGER, attempts INTEGER NOT NULL DEFAULT 0,
-    last_error TEXT, updated_at TEXT
+    last_error TEXT, updated_at TEXT,
+    -- filled by scripts/sync-store-links.mjs from the store's own API, so the app links to a
+    -- verified permalink rather than one assembled from a slug guess
+    woo_url TEXT, woo_status TEXT
   );
   -- Image links live in their own table (filled by scripts/attach-images.mjs) so a
   -- full rebuild never has to know about them, and so a product can carry several.
