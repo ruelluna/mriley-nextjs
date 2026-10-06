@@ -1,6 +1,30 @@
 [
   {
     "slug": "image-harvest-and-woocommerce-push",
+    "stamp": "2026-10-06-1030am",
+    "title": "Image harvest and WooCommerce push",
+    "topics": [
+      "image-harvest",
+      "woocommerce-push",
+      "catalog-sync",
+      "cost"
+    ],
+    "generatedAt": "2026-10-06T10:30:29.266Z",
+    "url": "/reports/image-harvest-and-woocommerce-push/2026-10-06-1030am",
+    "headline": {
+      "productsLive": 6145,
+      "imagesOk": 6145,
+      "imagesMiss": 437,
+      "coveragePct": 93,
+      "uploadWallClock": "1h33m",
+      "harvestWallClock": "84m05s",
+      "agentCostUsd": 1.040317,
+      "scriptTokenCostUsd": 0,
+      "failures": 0
+    }
+  },
+  {
+    "slug": "image-harvest-and-woocommerce-push",
     "stamp": "2026-10-06-0931am",
     "title": "Image harvest and WooCommerce push",
     "topics": [

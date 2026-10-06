@@ -146,6 +146,20 @@ const PHASES = [
     requests: "≈2 store requests per new product",
   },
   {
+    id: "upload-final",
+    kind: "upload",
+    label: "woo-bulk-live-final",
+    title: "WooCommerce push — the rest of the harvested catalog",
+    when: "2026-10-06",
+    what:
+      "Third pass, after the image harvest finished. Each pass fixes its scope when it starts, and the " +
+      "harvest kept delivering images while the earlier passes ran, so the SKUs that arrived last had " +
+      "never been in scope. The ledger means the ~3,800 products already live are recognised and " +
+      "skipped, not re-posted.",
+    scope: "2,336 new SKUs (6,145 candidates checked)",
+    requests: "≈2 store requests per new product, plus one existence check per already-live SKU",
+  },
+  {
     id: "upload-bulk",
     kind: "upload",
     label: "woo-bulk-live-1152",
@@ -238,7 +252,7 @@ async function storeAudit(ourIds) {
     let images = 0;
     let published = 0;
     let noCategory = 0;
-    for (let page = 1; page <= 40; page++) {
+    for (let page = 1; page <= 300; page++) {
       const { body } = await get(
         `/wp-json/wc/v3/products?per_page=100&page=${page}&status=any` +
           `&_fields=id,sku,status,images,categories,regular_price`,
@@ -437,6 +451,30 @@ async function main() {
     uploadBulk.startedUtc = bulk.startedUtc;
     uploadBulk.endedUtc = bulk.finishedUtc;
   }
+
+  // Show the jobs in the order they actually ran. A comparator that shrugs at the entries with no
+  // snapshot pair (the unmetered 200-SKU pilot, the aborted serial attempt) is inconsistent, and
+  // V8's sort then returns an arbitrary order — so give every phase an explicit key: its start
+  // time, or "immediately after the previous timed job" for the ones that have none.
+  const orderKey = new Map();
+  let prevTimed = "";
+  for (const p of phases) {
+    // Normalise the formats first: the snapshot rows are ISO ("...T07:50:34+00:00") while the
+    // audit rows use a space ("... 07:59:53"), and a space sorts before every 'T'.
+    const t = p.startedUtc ? String(p.startedUtc).replace(" ", "T") : "";
+    if (t) {
+      orderKey.set(p.id, t);
+      prevTimed = t;
+    } else {
+      // No snapshot pair: keep it next to the job it was declared after (empty key sorts first).
+      orderKey.set(p.id, prevTimed ? `${prevTimed}~` : "");
+    }
+  }
+  phases.sort((a, b) => {
+    const ka = orderKey.get(a.id) ?? "";
+    const kb = orderKey.get(b.id) ?? "";
+    return ka < kb ? -1 : ka > kb ? 1 : 0;
+  });
 
   // ---------------------------------------------------------------- spend
   const state = new DatabaseSync(STATE_DB, { readOnly: true });
