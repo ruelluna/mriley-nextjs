@@ -10,6 +10,8 @@ staging database (`gerber.db`) — a searchable, filterable catalog plus a page 
 | `/` | Catalog overview: counts, price range, entry points |
 | `/products` | The catalog — search, brand/category/department facets, price range, has-image filter, sort, pagination |
 | `/products/[sku]` | Product page: description, specification, dimensions, every source field, details panel, same-collection cards |
+| `/plan` | The MicroD image-harvest plan, served from `content/microd-image-plan.md` |
+| `/costs` | Agent spend — what the data work cost, per job / per day / per component, from the committed snapshot `data/spend.json` |
 | `/api/products` | JSON, same query params as `/products`: `q, brand, category, department, min, max, image, sort, page, per` |
 | `/api/products/[sku]` | One product with all source fields; `404` when the SKU is not in scope |
 | `/api/health` | Deployment diagnostics: runtime, resolved DB path, row counts, error (`503` when the DB is unreadable) |

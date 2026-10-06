@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:prepare": "node scripts/prepare-db.mjs",
     "db:build": "node scripts/build-catalog-db.mjs",
-    "images:attach": "node scripts/attach-images.mjs"
+    "images:attach": "node scripts/attach-images.mjs",
+    "spend:build": "node scripts/build-spend.mjs"
   },
   "dependencies": {
     "marked": "^18.0.14",

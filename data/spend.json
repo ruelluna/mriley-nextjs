@@ -1,0 +1,198 @@
+{
+  "generatedAt": "2026-10-06T01:28:22.338Z",
+  "source": {
+    "stateDb": "/opt/data/state.db",
+    "ledger": "/opt/data/gerber_import/cost_ledger.csv"
+  },
+  "currency": "USD",
+  "totals": {
+    "sessions": 21,
+    "calls": 645,
+    "inputTokens": 925686,
+    "outputTokens": 546868,
+    "cacheReadTokens": 50458368,
+    "cacheWriteTokens": 0,
+    "reasoningTokens": 284359,
+    "estimatedUsd": 0.618349,
+    "actualUsd": 0
+  },
+  "byDay": [
+    {
+      "day": "2026-10-04",
+      "calls": 195,
+      "inputTokens": 256124,
+      "outputTokens": 232452,
+      "cacheReadTokens": 17218176,
+      "reasoningTokens": 128138,
+      "usd": 0.229544
+    },
+    {
+      "day": "2026-10-05",
+      "calls": 319,
+      "inputTokens": 493592,
+      "outputTokens": 225369,
+      "cacheReadTokens": 27281536,
+      "reasoningTokens": 109356,
+      "usd": 0.291105
+    },
+    {
+      "day": "2026-10-06",
+      "calls": 131,
+      "inputTokens": 175970,
+      "outputTokens": 89047,
+      "cacheReadTokens": 5958656,
+      "reasoningTokens": 46865,
+      "usd": 0.0977
+    }
+  ],
+  "byComponent": [
+    {
+      "component": "(main turns)",
+      "calls": 422,
+      "usd": 0.449434
+    },
+    {
+      "component": "background_review",
+      "calls": 63,
+      "usd": 0.136378
+    },
+    {
+      "component": "approval",
+      "calls": 152,
+      "usd": 0.021658
+    },
+    {
+      "component": "compression",
+      "calls": 1,
+      "usd": 0.010567
+    },
+    {
+      "component": "title_generation",
+      "calls": 7,
+      "usd": 0.000311
+    }
+  ],
+  "byModel": [
+    {
+      "model": "deepseek-flash",
+      "provider": "deepseek",
+      "calls": 645,
+      "usd": 0.618349
+    }
+  ],
+  "pricing": [
+    {
+      "status": "(none)",
+      "source": "(none)",
+      "rows": 16
+    },
+    {
+      "status": "estimated",
+      "source": "official_docs_snapshot",
+      "rows": 5
+    }
+  ],
+  "ledger": [
+    {
+      "tsUtc": "2026-10-06T00:48:59Z",
+      "label": "baseline before images-1000",
+      "apiCalls": 527,
+      "inputTokens": 779489,
+      "outputTokens": 463104,
+      "cacheReadTokens": 44685312,
+      "reasoningTokens": 239868,
+      "cumulativeUsd": 0.528842,
+      "deltaUsd": 0.528842
+    },
+    {
+      "tsUtc": "2026-10-06T00:49:32Z",
+      "label": "START images-1000-sealy-uttermost",
+      "apiCalls": 536,
+      "inputTokens": 790561,
+      "outputTokens": 468001,
+      "cacheReadTokens": 44980480,
+      "reasoningTokens": 243594,
+      "cumulativeUsd": 0.534326,
+      "deltaUsd": 0.005484
+    },
+    {
+      "tsUtc": "2026-10-06T01:06:08Z",
+      "label": "END images-1000-sealy-uttermost",
+      "apiCalls": 574,
+      "inputTokens": 855303,
+      "outputTokens": 494822,
+      "cacheReadTokens": 45752320,
+      "reasoningTokens": 257440,
+      "cumulativeUsd": 0.562446,
+      "deltaUsd": 0.02812
+    }
+  ],
+  "afterLastSnapshotUsd": 0.055903,
+  "jobs": [
+    {
+      "id": "images-batch-1",
+      "label": "images-1000-sealy-uttermost",
+      "title": "Image harvest — batch 1",
+      "detail": "1,000 SKUs (500 Sealy + 500 Uttermost) · width w_1000 · 5 workers · 1 req/s per host",
+      "skus": 1000,
+      "images": 1000,
+      "misses": 0,
+      "wallClock": "16m36s",
+      "imagesAttachedToSite": 1152,
+      "bytes": 82900000,
+      "tokensSpent": 0,
+      "note": "The harvest is plain HTTP: 1,000 dealer-page fetches + 1,000 CDN downloads. It spends no tokens at all — the dollar figure is the agent turns around a 16-minute job.",
+      "startedUtc": "2026-10-06T00:49:32Z",
+      "endedUtc": "2026-10-06T01:06:08Z",
+      "costUsd": 0.02812,
+      "perThousandUsd": 0.02812
+    },
+    {
+      "id": "images-pilot",
+      "label": "pilot-200",
+      "title": "Image harvest — pilot (200 SKUs, all brands)",
+      "detail": "200 SKUs stratified across every brand · the run that proved the method",
+      "skus": 200,
+      "images": 152,
+      "misses": 48,
+      "wallClock": "48s (48-SKU second pass)",
+      "imagesAttachedToSite": 152,
+      "bytes": 0,
+      "tokensSpent": 0,
+      "note": "100% on every brand whose dealer host was known; 0% on the long-tail brands whose host is still unresolved — the misses are host discovery, not a broken pipeline.",
+      "startedUtc": null,
+      "endedUtc": null,
+      "costUsd": null,
+      "perThousandUsd": null
+    }
+  ],
+  "projections": [
+    {
+      "work": "Image harvest — remaining Sealy + Uttermost (4,504 SKUs)",
+      "basis": "Hosts already proven; same script, no new groundwork",
+      "eta": "~75 min at the measured 60 SKUs/min",
+      "usdLow": 0.03,
+      "usdHigh": 0.05
+    },
+    {
+      "work": "Image harvest — 926 SKUs on brands with no host yet",
+      "basis": "Per-brand dealer-host discovery: search-heavy, not download-heavy",
+      "eta": "depends on how many hosts resolve",
+      "usdLow": 0.1,
+      "usdHigh": 0.2
+    },
+    {
+      "work": "WooCommerce bulk create (6,534 products)",
+      "basis": "Scripted REST writes — model spend is only the agent turns around the run",
+      "eta": "not yet estimated",
+      "usdLow": null,
+      "usdHigh": null
+    }
+  ],
+  "caveats": [
+    "Estimated, not invoiced. DeepSeek returns no billed cost, so actual_cost_usd stays 0 and every figure comes from the provider's published rate card (cost_source official_docs_snapshot). Reconcile against the DeepSeek dashboard, not this page.",
+    "Off-peak rates. DeepSeek charges up to 2x inside its peak windows (weekdays ~01–04 and ~06–10 UTC), so a run that straddles one can cost up to double what is shown here.",
+    "Cache-read tokens dominate the raw token counts but not the price — 48M cache-read tokens bill at a fraction of the input rate. Never read them as billable input.",
+    "Non-LLM work costs nothing in tokens. Downloads, database builds and deploys have no model spend of their own; the dollar figure around them is the agent's own reasoning turns."
+  ]
+}
