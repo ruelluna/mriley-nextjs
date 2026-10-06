@@ -121,9 +121,11 @@ Next's image optimizer would only add Vercel cost for 6k products.
 
 ## Known gaps
 
-- **Images: 13 of 6,583 attached (demo sample).** The source sheet has none, so they are pulled from
-  the MicroD CDN — see the harvest plan at `/plan`. Cards fall back to a brand-initial placeholder
-  until a product's image is attached.
+- **Images: 1,152 of 6,583 attached (17%).** The source sheet has none — they are pulled from the
+  MicroD CDN (`images.webfronts.com`) via dealer hosts; Sealy and Uttermost are covered end to end.
+  The remaining 5,430 priced SKUs are image-less: 4,504 on brands whose host is already proven,
+  926 awaiting per-brand host discovery. See the harvest plan at `/plan`. Cards fall back to a
+  brand-initial placeholder until a product's image is attached.
 - **Product pages are not the store.** Prices are source display prices; confirm on
   gerbersfurniture.com before anything is published.
 - **Deploy data.** Vercel reads only the committed `data/catalog.db` (the priced set). If the whole

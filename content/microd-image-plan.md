@@ -5,7 +5,7 @@
 
 **Scope:** the 6,582 distinct SKUs with `Display Price` > 0 (the upload set from `PLAN.md` §2).
 
-**Status:** image source found and the pipeline proven end-to-end on a sample. Full run not yet started.
+**Status:** pilot done, **batch 1 done** — 1,000 SKUs harvested, 1,152 images attached to this catalog site. 5,430 priced SKUs remain.
 
 ---
 
@@ -131,6 +131,29 @@ Every long-tail miss failed identically — the fallback chain ended at a **matt
 problem: **100% on every brand whose host is known.** 17 images are byte-identical across 2+ SKUs
 (shared accessories/sizes) → dedupe by md5 when uploading to WooCommerce. Fix before the full sweep:
 resolve one host per long-tail brand (§3).
+
+**Batch 1 — the first 1,000 SKUs, 2026-10-06: 1,000/1,000 = 100%**
+
+500 Sealy + 500 Uttermost (`batch_1000.csv`) — the two brands whose hosts the pilot confirmed — run at
+`w_1000`, 5 workers, 1 req/s per host, resume-safe.
+
+| Measure | Result |
+|---|---|
+| Images | **1,000 / 1,000** (Sealy 500/500, Uttermost 500/500), 0 misses |
+| Integrity | 1,000 files on disk, all valid JPEG (`\xff\xd8`), 0 missing, 0 corrupt |
+| Volume | 82.9 MB total, **81 KB average** (lighter than the pilot's 105 KB estimate) |
+| Wall clock | **16m36s** → ~60 SKUs/min |
+| Agent cost | **$0.028120** for the batch (START/END ledger snapshots) |
+| Attached | `product_images` = **1,152** rows (1,000 new + 152 pilot) |
+
+Two facts worth carrying forward: the harvest itself spends **zero tokens** (plain HTTP downloads — the
+$0.028 is the agent turns around a 16-minute job), and **119 of the 1,000** images are byte-identical to
+another SKU's (variant siblings sharing one photo) → dedupe by md5 on upload, do not treat as an error.
+Uttermost is pinned to a single host and was the bottleneck; a second Uttermost host speeds up the rest.
+
+**Still to do:** 5,430 priced SKUs without an image — Sealy 2,797 + Uttermost 1,707 with hosts already
+proven (~75 min at the measured pace), plus 926 that need per-brand host discovery (Tempur-Pedic 370,
+Stearns & Foster 259, Flexsteel 88, A America 49, 8 small brands ≈ 166).
 
 **Artifacts:**
 
