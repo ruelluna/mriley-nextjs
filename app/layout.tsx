@@ -27,11 +27,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <header className="border-b border-black/[.08] dark:border-white/[.145]">
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-3">
-            <Link href="/" className="text-sm font-semibold tracking-tight">
+          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-6 py-3">
+            <Link href="/" className="whitespace-nowrap text-sm font-semibold tracking-tight">
               Gerber Furniture <span className="font-normal text-zinc-500">· catalog</span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm text-zinc-500">
+            <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500">
               <Link href="/products" className="hover:text-black dark:hover:text-zinc-100">Products</Link>
               <Link href="/plan" className="hover:text-black dark:hover:text-zinc-100">Plan</Link>
               <Link href="/costs" className="hover:text-black dark:hover:text-zinc-100">Costs</Link>
