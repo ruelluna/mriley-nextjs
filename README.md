@@ -16,6 +16,10 @@ staging database (`gerber.db`) — a searchable, filterable catalog plus a page 
 | `/api/products` | JSON, same query params as `/products`: `q, brand, category, department, min, max, image, sort, page, per` |
 | `/api/products/[sku]` | One product with all source fields; `404` when the SKU is not in scope |
 | `/api/health` | Deployment diagnostics: runtime, resolved DB path, row counts, error (`503` when the DB is unreadable) |
+| `/sync` | Sync console — what the daily sync uploaded, what is queued, and why (from `data/gerber-sync.json`) |
+| `/sync/uploaded` | Everything pushed to the store, filterable by brand, state and batch |
+| `/sync/queue` | Not live yet: `no photo`, `no price`, `held`, `duplicate`, each with an explanation |
+| `/api/sync` | The same snapshot as JSON; `?list=uploaded|queue`, `?reason=`, `?brand=`, `?format=csv` |
 
 All routes are server-rendered on demand (`ƒ`) — nothing is prerendered, so the data is never stale.
 
