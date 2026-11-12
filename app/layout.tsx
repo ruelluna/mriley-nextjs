@@ -35,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/products" className="hover:text-black dark:hover:text-zinc-100">Products</Link>
               <Link href="/plan" className="hover:text-black dark:hover:text-zinc-100">Plan</Link>
               <Link href="/plan/brand-rep-portal" className="hover:text-black dark:hover:text-zinc-100">Rep portal</Link>
+              <Link href="/plan/sync-console" className="hover:text-black dark:hover:text-zinc-100">Sync console</Link>
               <Link href="/costs" className="hover:text-black dark:hover:text-zinc-100">Costs</Link>
               <Link href="/reports" className="hover:text-black dark:hover:text-zinc-100">Reports</Link>
               <Link href="/api/products?per=5" className="hover:text-black dark:hover:text-zinc-100">API</Link>
